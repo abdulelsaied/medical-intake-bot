@@ -87,25 +87,17 @@ async def twilio_start_bot(request: Request):
     try:
         # Get form data from Twilio
         form_data = await request.form()
-        print("Received form data:", form_data)
         data = dict(form_data)
-        print("Data dictionary:", data)
         callId = data.get("CallSid")
         
         if not callId:
-            print("Missing CallSid in request")
             raise HTTPException(status_code=500, detail="Missing 'CallSid' in request")
         
-        print("Creating Daily room for callId:", callId)
         # Create Daily room and get token
         room, token = await create_daily_room(callId)
-        print("Room created:", room.url)
-        print("Token obtained:", token[:10] + "...")
         
-        # Start bot process
-        venv_python = os.path.join(os.path.dirname(os.path.abspath(__file__)), "venv", "bin", "python")
-        bot_cmd = [venv_python, "bot_twilio.py", "-u", room.url, "-t", token, "-i", callId, "-s", room.config.sip_endpoint]
-        print("Starting bot with command:", " ".join(bot_cmd))
+        # Start bot process using system Python
+        bot_cmd = ["python3", "bot_twilio.py", "-u", room.url, "-t", token, "-i", callId, "-s", room.config.sip_endpoint]
         
         try:
             process = subprocess.Popen(
@@ -113,8 +105,8 @@ async def twilio_start_bot(request: Request):
                 cwd=os.path.dirname(os.path.abspath(__file__)),
                 stderr=subprocess.PIPE,
                 stdout=subprocess.PIPE,
-                text=True,  # Use text mode instead of binary
-                bufsize=1,  # Line buffered
+                text=True,
+                bufsize=1,
             )
             
             def print_output(pipe, prefix):
@@ -138,7 +130,6 @@ async def twilio_start_bot(request: Request):
         except Exception as e:
             if isinstance(e, HTTPException):
                 raise
-            print("Failed to start bot process:", str(e))
             raise HTTPException(status_code=500, detail=f"Failed to start bot: {e}")
         
         # Put caller on hold with music
@@ -150,10 +141,12 @@ async def twilio_start_bot(request: Request):
         return str(resp)
     except Exception as e:
         print("Endpoint error:", str(e))
-        print("Full error:", e.__class__.__name__, str(e))
-        import traceback
-        print("Traceback:", traceback.format_exc())
         raise
+
+# Vercel handler
+def handler(request):
+    """Handle incoming requests for Vercel serverless functions"""
+    return app(request)
 
 if __name__ == "__main__":
     # Check environment variables
