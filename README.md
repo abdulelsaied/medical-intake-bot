@@ -1,7 +1,6 @@
 # Medical Intake Chatbot
 
-Chatbot for the Assort Health Take Home.
+Chatbot that collects patient information, then schedules an appointment time. 
 
 Phone Number: +1 (762) 775 - 7359
 
-Email gets sent to jeff@assorthealth.com (might end up in spam folder)

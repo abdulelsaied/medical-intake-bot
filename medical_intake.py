@@ -359,7 +359,7 @@ class MedicalIntakeProcessor:
             
             message = Mail(
                 from_email='abdul.elsaied2@gmail.com',
-                to_emails='jeff@assorthealth.com',
+                to_emails='abdul.elsaied2@gmail.com',
                 subject=f'New Appointment Scheduled - {patient_name}',
                 html_content=f"""
                 <h2>New Appointment Scheduled</h2>
